@@ -13,16 +13,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Set;
 
 @Controller
-// SOLID S — каждый класс решает свою основную задачу. Здесь задача — принимать веб-запросы.
-// MVC — разделение данных, обработки запросов и отображения страниц; этот класс — контроллер.
-// На защите: "контроллер получает запрос, а изменение данных поручает сервису".
+// SOLID S — Single Responsibility Principle (Принцип единственной ответственности):
+// класс отвечает за одну задачу. Здесь контроллер принимает запросы и выбирает страницы;
+// правила изменения данных он передаёт AdminService.
+// MVC — Model-View-Controller (Модель-Представление-Контроллер): данные, страницы
+// и обработка запросов разделены. Этот класс — Controller, шаблоны Thymeleaf — View.
+// На защите: "Контроллер получает запрос и поручает работу нужному сервису".
 public class PagesController {
     private final DirectoryFacade directory;
     private final AdminService admin;
     private final AccessService access;
     public PagesController(DirectoryFacade directory, AdminService admin, AccessService access) {
-        // FACADE — один простой вход к нескольким компонентам. Здесь это directory для трёх репозиториев.
-        // На защите: "контроллеру не нужно самому обращаться к каждому репозиторию".
         this.directory = directory; this.admin = admin; this.access = access;
     }
     @ModelAttribute void navigation(Model model, Authentication auth) {
