@@ -17,13 +17,16 @@ public class AppUser {
         this.username = username; this.passwordHash = passwordHash; this.fullName = fullName;
         this.role = role; this.department = department;
     }
-    // BUILDER — Builder (Строитель, порождающий паттерн): создаёт объект по шагам.
-    // В нашем коде: обязательные данные пользователя передаются в builder(),
-    // дополнительные — через department() и enabled(), а build() создаёт AppUser.
-    // На защите: "Так удобно создавать пользователя с разным набором полей".
     public static Builder builder(String username, String passwordHash, String fullName, Role role) {
         return new Builder(username, passwordHash, fullName, role);
     }
+
+    // BUILDER — Builder (Строитель, порождающий паттерн)
+    // Определение: объект создаётся по шагам; обязательные и дополнительные данные
+    // можно задать отдельно, а готовый объект получить вызовом build().
+    // В этом проекте: Builder собирает AppUser. Логин, хеш пароля, имя и роль
+    // обязательны; отдел и состояние учётной записи задаются при необходимости.
+    // На защите: "Строитель помогает понятно создать нового пользователя".
     public static class Builder {
         private final String username;
         private final String passwordHash;

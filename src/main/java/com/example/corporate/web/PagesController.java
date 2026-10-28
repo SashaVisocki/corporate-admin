@@ -13,12 +13,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Set;
 
 @Controller
-// SOLID S — Single Responsibility Principle (Принцип единственной ответственности):
-// класс отвечает за одну задачу. Здесь контроллер принимает запросы и выбирает страницы;
+// SOLID S — Single Responsibility Principle (Принцип единственной ответственности)
+// Определение: класс должен отвечать за одну основную задачу.
+// В этом проекте: PagesController принимает HTTP-запросы и выбирает страницы;
 // правила изменения данных он передаёт AdminService.
-// MVC — Model-View-Controller (Модель-Представление-Контроллер): данные, страницы
-// и обработка запросов разделены. Этот класс — Controller, шаблоны Thymeleaf — View.
-// На защите: "Контроллер получает запрос и поручает работу нужному сервису".
+// На защите: "Контроллер принимает запрос, но не хранит в себе всю логику".
+
+// MVC — Model-View-Controller (Модель-Представление-Контроллер)
+// Определение: данные, отображение и обработка запросов разделены.
+// В этом проекте: этот класс — Controller; AppUser, Role и Department — Model;
+// HTML-шаблоны Thymeleaf — View.
+// На защите: "MVC разделяет данные, страницы и управление ими".
 public class PagesController {
     private final DirectoryFacade directory;
     private final AdminService admin;

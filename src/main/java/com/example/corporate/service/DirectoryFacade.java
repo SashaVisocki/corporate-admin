@@ -10,11 +10,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-// FACADE — Facade (Фасад, структурный паттерн): даёт один простой вход к нескольким
-// внутренним компонентам и скрывает подробности их использования.
-// В нашем коде: PagesController обращается к DirectoryFacade, который сам берёт
+// FACADE — Facade (Фасад, структурный паттерн)
+// Определение: один простой объект даёт доступ к нескольким внутренним частям
+// системы и скрывает от вызывающего кода, как именно они устроены.
+// В этом проекте: PagesController обращается к DirectoryFacade, а тот получает
 // сотрудников, отделы и роли из трёх репозиториев.
-// На защите: "Контроллер просит данные у фасада, а фасад знает, где их взять".
+// На защите: "Контроллеру не нужно самому работать с тремя репозиториями".
 public class DirectoryFacade {
     private final UserRepository users;
     private final DepartmentRepository departments;
