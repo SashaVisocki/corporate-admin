@@ -17,6 +17,31 @@ public class AppUser {
         this.username = username; this.passwordHash = passwordHash; this.fullName = fullName;
         this.role = role; this.department = department;
     }
+    // BUILDER (порождающий). Подсказка для защиты: "собираю пользователя по шагам: обязательные поля, затем отдел и активность".
+    public static Builder builder(String username, String passwordHash, String fullName, Role role) {
+        return new Builder(username, passwordHash, fullName, role);
+    }
+    public static class Builder {
+        private final String username;
+        private final String passwordHash;
+        private final String fullName;
+        private final Role role;
+        private Department department;
+        private boolean enabled = true;
+        private Builder(String username, String passwordHash, String fullName, Role role) {
+            this.username = username;
+            this.passwordHash = passwordHash;
+            this.fullName = fullName;
+            this.role = role;
+        }
+        public Builder department(Department department) { this.department = department; return this; }
+        public Builder enabled(boolean enabled) { this.enabled = enabled; return this; }
+        public AppUser build() {
+            AppUser user = new AppUser(username, passwordHash, fullName, role, department);
+            user.setEnabled(enabled);
+            return user;
+        }
+    }
     public Long getId() { return id; }
     public String getUsername() { return username; }
     public String getPasswordHash() { return passwordHash; }

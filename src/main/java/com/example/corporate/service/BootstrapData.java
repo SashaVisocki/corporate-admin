@@ -32,7 +32,7 @@ public class BootstrapData implements CommandLineRunner {
             if (password == null || password.length() < 12) {
                 throw new IllegalStateException("Set ADMIN_PASSWORD to at least 12 characters before first run");
             }
-            users.save(new AppUser(username, encoder.encode(password), "Administrator", admin, null));
+            users.save(AppUser.builder(username, encoder.encode(password), "Administrator", admin).build());
         }
     }
 }

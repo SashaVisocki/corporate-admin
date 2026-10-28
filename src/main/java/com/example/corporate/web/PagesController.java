@@ -1,9 +1,9 @@
 package com.example.corporate.web;
 
 import com.example.corporate.model.Permission;
-import com.example.corporate.repository.*;
 import com.example.corporate.security.AccessService;
 import com.example.corporate.service.AdminService;
+import com.example.corporate.service.DirectoryFacade;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -13,15 +13,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Set;
 
 @Controller
+// SOLID S / MVC. Подсказка для защиты: "контроллер принимает запросы, а правила изменения данных живут в сервисе".
 public class PagesController {
-    private final UserRepository users;
-    private final DepartmentRepository departments;
-    private final RoleRepository roles;
+    private final DirectoryFacade directory;
     private final AdminService admin;
     private final AccessService access;
-    public PagesController(UserRepository users, DepartmentRepository departments, RoleRepository roles,
-                           AdminService admin, AccessService access) {
-        this.users = users; this.departments = departments; this.roles = roles; this.admin = admin; this.access = access;
+    public PagesController(DirectoryFacade directory, AdminService admin, AccessService access) {
+        // FACADE. Подсказка: "для чтения контроллеру достаточно одного объекта directory".
+        this.directory = directory; this.admin = admin; this.access = access;
     }
     @ModelAttribute void navigation(Model model, Authentication auth) {
         model.addAttribute("canEmployees", access.can(auth, "EMPLOYEE_READ"));
@@ -36,20 +35,20 @@ public class PagesController {
     @GetMapping("/denied") String denied() { return "denied"; }
     @GetMapping("/") String home(Model model, Authentication auth) {
         model.addAttribute("username", auth.getName());
-        model.addAttribute("employeeCount", users.count());
-        model.addAttribute("departmentCount", departments.count());
+        model.addAttribute("employeeCount", directory.employeeCount());
+        model.addAttribute("departmentCount", directory.departmentCount());
         return "home";
     }
     @GetMapping("/employees") @PreAuthorize("@access.can(authentication, 'EMPLOYEE_READ')")
-    String employees(Model model) { model.addAttribute("employees", users.findAll()); return "employees"; }
+    String employees(Model model) { model.addAttribute("employees", directory.employees()); return "employees"; }
     @GetMapping("/employees/new") @PreAuthorize("@access.can(authentication, 'USER_MANAGE')")
     String newEmployee(Model model) { employeeForm(model, null); return "employee-form"; }
     @GetMapping("/employees/{id}/edit") @PreAuthorize("@access.can(authentication, 'USER_MANAGE')")
     String editEmployee(@PathVariable Long id, Model model) { employeeForm(model, id); return "employee-form"; }
     @GetMapping("/employees/{id}/profile") @PreAuthorize("@access.can(authentication, 'EMPLOYEE_WRITE')")
     String editProfile(@PathVariable Long id, Model model) {
-        model.addAttribute("employee", users.findById(id).orElseThrow(() -> new IllegalArgumentException("Сотрудник не найден")));
-        model.addAttribute("departments", departments.findAll());
+        model.addAttribute("employee", directory.employee(id));
+        model.addAttribute("departments", directory.departments());
         return "profile-form";
     }
     @PostMapping("/employees/{id}/profile") @PreAuthorize("@access.can(authentication, 'EMPLOYEE_WRITE')")
@@ -60,8 +59,8 @@ public class PagesController {
         return "redirect:/employees";
     }
     private void employeeForm(Model model, Long id) {
-        model.addAttribute("employee", id == null ? null : users.findById(id).orElseThrow(() -> new IllegalArgumentException("Сотрудник не найден")));
-        model.addAttribute("roles", roles.findAll()); model.addAttribute("departments", departments.findAll());
+        model.addAttribute("employee", id == null ? null : directory.employee(id));
+        model.addAttribute("roles", directory.roles()); model.addAttribute("departments", directory.departments());
     }
     @PostMapping("/employees/save") @PreAuthorize("@access.can(authentication, 'USER_MANAGE')")
     String saveEmployee(@RequestParam(required = false) Long id, @RequestParam(required = false) String username,
@@ -73,7 +72,7 @@ public class PagesController {
         return "redirect:/employees";
     }
     @GetMapping("/departments") @PreAuthorize("@access.can(authentication, 'DEPARTMENT_READ')")
-    String departments(Model model) { model.addAttribute("departments", departments.findAll()); return "departments"; }
+    String departments(Model model) { model.addAttribute("departments", directory.departments()); return "departments"; }
     @PostMapping("/departments/save") @PreAuthorize("@access.can(authentication, 'DEPARTMENT_WRITE')")
     String saveDepartment(@RequestParam(required = false) Long id, @RequestParam String name, RedirectAttributes flash) {
         try { admin.saveDepartment(id, name); flash.addFlashAttribute("message", "Отдел сохранён"); }
@@ -81,7 +80,7 @@ public class PagesController {
         return "redirect:/departments";
     }
     @GetMapping("/roles") @PreAuthorize("@access.can(authentication, 'ROLE_READ')")
-    String roles(Model model) { model.addAttribute("roles", roles.findAll()); model.addAttribute("permissions", Permission.values()); return "roles"; }
+    String roles(Model model) { model.addAttribute("roles", directory.roles()); model.addAttribute("permissions", Permission.values()); return "roles"; }
     @PostMapping("/roles/{id}/permissions") @PreAuthorize("@access.can(authentication, 'ROLE_WRITE')")
     String savePermissions(@PathVariable Long id, @RequestParam(required = false) Set<Permission> permissions, RedirectAttributes flash) {
         try { admin.savePermissions(id, permissions); flash.addFlashAttribute("message", "Права роли сохранены"); }

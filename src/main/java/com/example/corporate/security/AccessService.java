@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service("access")
+// STRATEGY / SOLID O, D: используем интерфейс; новый способ проверки можно добавить отдельной реализацией.
+// Подсказка для защиты: "я вызываю политику доступа, не привязываясь к её конкретному классу".
 public class AccessService {
     private final UserRepository users;
     private final AccessPolicy policy;
