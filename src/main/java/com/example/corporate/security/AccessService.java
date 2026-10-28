@@ -6,8 +6,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service("access")
-// STRATEGY / SOLID O, D: используем интерфейс; новый способ проверки можно добавить отдельной реализацией.
-// Подсказка для защиты: "я вызываю политику доступа, не привязываясь к её конкретному классу".
+// STRATEGY — способ проверки скрыт за интерфейсом AccessPolicy; здесь вызываем выбранную реализацию.
+// SOLID O (открыт/закрыт) — новый способ проверки можно добавить без переписывания этого класса.
+// SOLID D (инверсия зависимостей) — сервис зависит от интерфейса, а не от RoleAccessPolicy напрямую.
+// На защите: "сервис просит проверить право, не зная деталей самой проверки".
 public class AccessService {
     private final UserRepository users;
     private final AccessPolicy policy;

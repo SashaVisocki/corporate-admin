@@ -10,7 +10,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 @Service
-// SOLID S. Подсказка для защиты: "этот класс меняет данные, а страницы показывает контроллер".
+// SOLID S (единственная ответственность) — у класса должна быть одна основная задача.
+// В проекте: этот сервис проверяет и изменяет данные; страницы показывает PagesController.
+// На защите: "за правила изменения отвечает сервис, за веб-страницы — контроллер".
 public class AdminService {
     private final UserRepository users;
     private final RoleRepository roles;
@@ -37,7 +39,7 @@ public class AdminService {
             if (!cleanUsername.matches("[A-Za-z0-9._-]+")) throw new IllegalArgumentException("Логин: только латинские буквы, цифры, точка, дефис и _");
             if (users.existsByUsername(cleanUsername)) throw new IllegalArgumentException("Логин уже занят");
             if (password == null || password.length() < 12) throw new IllegalArgumentException("Пароль должен содержать минимум 12 символов");
-            // BUILDER. Подсказка: "обязательные данные задаю сразу, дополнительные — по шагам".
+            // BUILDER — пошаговое создание объекта. Подсказка: "здесь собираю нового пользователя".
             AppUser user = AppUser.builder(cleanUsername, encoder.encode(password), cleanName, role)
                 .department(department).enabled(enabled).build();
             users.save(user);

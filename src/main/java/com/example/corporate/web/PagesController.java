@@ -13,13 +13,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Set;
 
 @Controller
-// SOLID S / MVC. Подсказка для защиты: "контроллер принимает запросы, а правила изменения данных живут в сервисе".
+// SOLID S — каждый класс решает свою основную задачу. Здесь задача — принимать веб-запросы.
+// MVC — разделение данных, обработки запросов и отображения страниц; этот класс — контроллер.
+// На защите: "контроллер получает запрос, а изменение данных поручает сервису".
 public class PagesController {
     private final DirectoryFacade directory;
     private final AdminService admin;
     private final AccessService access;
     public PagesController(DirectoryFacade directory, AdminService admin, AccessService access) {
-        // FACADE. Подсказка: "для чтения контроллеру достаточно одного объекта directory".
+        // FACADE — один простой вход к нескольким компонентам. Здесь это directory для трёх репозиториев.
+        // На защите: "контроллеру не нужно самому обращаться к каждому репозиторию".
         this.directory = directory; this.admin = admin; this.access = access;
     }
     @ModelAttribute void navigation(Model model, Authentication auth) {

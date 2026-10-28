@@ -17,7 +17,9 @@ public class AppUser {
         this.username = username; this.passwordHash = passwordHash; this.fullName = fullName;
         this.role = role; this.department = department;
     }
-    // BUILDER (порождающий). Подсказка для защиты: "собираю пользователя по шагам: обязательные поля, затем отдел и активность".
+    // BUILDER (порождающий) — создание сложного объекта по шагам вместо одного длинного конструктора.
+    // В проекте: сначала задаём логин, пароль, имя и роль; затем при необходимости отдел и активность.
+    // На защите: "Builder помогает понятно собрать нового пользователя".
     public static Builder builder(String username, String passwordHash, String fullName, Role role) {
         return new Builder(username, passwordHash, fullName, role);
     }
